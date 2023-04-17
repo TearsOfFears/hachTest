@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:12
+    environment:
+      PG_DATA: /var/lib/postgresql/data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: hackTest
+    volumes:
+      - hackTest:/var/lib/postgresql/data
+    ports:
+      - 5416:5432
+    expose:
+      - 5416
+    restart: always
+  pgadmin:
+    container_name: pg_admin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+       - 80:80
+    restart: unless-stopped
+volumes:
+  hackTest:
+  pgadmin:

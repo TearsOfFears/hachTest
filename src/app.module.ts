@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { getSequelizeConfig } from './configs/sequelize';
+import { QuestionModule } from './question/question.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    SequelizeModule.forRootAsync(getSequelizeConfig()),
+    QuestionModule,
+  ],
+  // providers: [],
 })
 export class AppModule {}
