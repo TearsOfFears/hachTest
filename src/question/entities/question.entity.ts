@@ -5,6 +5,8 @@ import {
   PrimaryKey,
   DataType,
   ForeignKey,
+  HasOne,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Answer } from './answer.entity';
 import { Subject } from '../../subject/entities/subject.entity';
@@ -17,19 +19,22 @@ import { Subject } from '../../subject/entities/subject.entity';
 export class Question extends Model<Question> {
   @PrimaryKey
   @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
-  question_id: string;
+  questionId: string;
 
   @Column(DataType.STRING(100))
   question: string;
 
-  @Column(DataType.STRING(100))
-  subject: string;
+  @BelongsTo(() => Answer)
+  answer: Answer;
 
   @ForeignKey(() => Answer)
   @Column({ type: DataType.UUID })
-  answer_id: string;
+  answerId: string;
+
+  @BelongsTo(() => Subject)
+  subject: Subject;
 
   @ForeignKey(() => Subject)
   @Column({ type: DataType.UUID })
-  subject_id: string;
+  subjectId: string;
 }

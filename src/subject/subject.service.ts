@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Subject } from './entities/subject.entity';
 @Injectable()
-export class QuestionService {
+export class SubjectService {
   constructor() {}
 }

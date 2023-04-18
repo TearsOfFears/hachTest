@@ -8,7 +8,7 @@ export class AnswerRepository {
     @InjectModel(Answer) private readonly answerModel: typeof Answer,
   ) {}
 
-  async create(dtoIn) {
-    return await this.answerModel.create(dtoIn);
+  async create(answerChatGpt: string) {
+    return await this.answerModel.create({ answerChatGpt });
   }
 }

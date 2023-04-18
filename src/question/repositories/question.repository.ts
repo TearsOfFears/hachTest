@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Question } from '../entities/question.entity';
+import { Answer } from '../entities/answer.entity';
+import { Subject } from '../../subject/entities/subject.entity';
 @Injectable()
 export class QuestionRepository {
   constructor(
@@ -9,8 +11,26 @@ export class QuestionRepository {
   async create(dtoIn): Promise<Question> {
     return await this.questionModel.create(dtoIn);
   }
-  async find(): Promise<Question[]> {
-    return await this.questionModel.findAll({});
+  async findAll(): Promise<Question[]> {
+    return await this.questionModel.findAll({
+      include: [
+        {
+          model: Answer,
+        },
+        {
+          model: Subject,
+        },
+      ],
+    });
+  }
+  async get(): Promise<Question> {
+    return await this.questionModel.findOne({
+      include: [
+        {
+          model: Answer,
+        },
+      ],
+    });
   }
 }
 

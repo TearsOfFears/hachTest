@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { QuestionController } from './question.controller';
-import { QuestionService } from './question.service';
+import { SubjectController } from './subject.controller';
+import { SubjectService } from './subject.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Subject } from './entities/subject.entity';
 import { SubjectRepository } from './repositories/subject.repository';
 
 @Module({
   imports: [SequelizeModule.forFeature([Subject])],
-  controllers: [QuestionController],
-  providers: [QuestionService, SubjectRepository],
+  controllers: [SubjectController],
+  providers: [SubjectService, SubjectRepository],
   exports: [SubjectRepository],
 })
 export class SubjectModule {}

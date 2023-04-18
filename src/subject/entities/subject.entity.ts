@@ -4,7 +4,11 @@ import {
   Table,
   PrimaryKey,
   DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
 } from 'sequelize-typescript';
+import { Question } from '../../question/entities/question.entity';
 
 @Table({
   timestamps: true,
@@ -13,12 +17,15 @@ import {
 })
 export class Subject extends Model {
   @PrimaryKey
-  @Column({ type: DataType.UUID, defaultValue: DataType.UUID })
-  subject_id: string;
+  @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
+  subjectId: string;
 
-  @Column(DataType.STRING(20000))
+  @Column(DataType.STRING(250))
   title: string;
 
   @Column(DataType.STRING(20000))
   university: string;
+
+  @HasMany(() => Question)
+  question: Question[];
 }

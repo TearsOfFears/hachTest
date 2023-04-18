@@ -4,8 +4,9 @@ import {
   Table,
   PrimaryKey,
   DataType,
+  HasOne,
 } from 'sequelize-typescript';
-
+import { Question } from './question.entity';
 @Table({
   timestamps: true,
   createdAt: true,
@@ -14,14 +15,21 @@ import {
 export class Answer extends Model {
   @PrimaryKey
   @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
-  answer_id: string;
+  answerId: string;
 
   @Column(DataType.STRING(20000))
-  answer_chat_gpt: string;
+  answerChatGpt: string;
 
-  @Column(DataType.STRING(20000))
-  answer_from_human: string;
+  @Column({
+    type: DataType.STRING(20000),
+    defaultValue:
+      'Ніхто з студентів не запропонував відповідь.Будь першим!!!))',
+  })
+  answerFromHuman: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  is_human_valid_answer: boolean;
+  isHumanValidAnswer: boolean;
+
+  @HasOne(() => Question)
+  question: Question;
 }
