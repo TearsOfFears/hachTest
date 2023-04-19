@@ -1,2 +1,2 @@
 # hackTest
-Nest.js application with integration with chatGPT
+Frontend repository - https://github.com/TearsOfFears/hackTestFront
