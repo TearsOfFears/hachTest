@@ -1,2 +1,2 @@
-# hackTest
-Nest.js application with integration with chatGPT
+# Hack Test Backend
+<a href="https://github.com/TearsOfFears/hackTestFront">Frontend repository </a><br>
