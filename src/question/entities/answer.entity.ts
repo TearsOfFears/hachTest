@@ -30,6 +30,9 @@ export class Answer extends Model {
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isHumanValidAnswer: boolean;
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isGptValidAnswer: boolean;
+
   @HasOne(() => Question)
   question: Question;
 }

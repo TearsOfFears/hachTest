@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { QuestionController } from './question.controller';
-import { QuestionService } from './question.service';
+import { QuestionService } from './services/question.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Question } from './entities/question.entity';
 import { Answer } from './entities/answer.entity';
@@ -9,9 +9,10 @@ import { QuestionRepository } from './repositories/question.repository';
 import { OpenAIModule } from '@platohq/nestjs-openai';
 import { OpenAIService } from './services/openAI.service';
 import { ConfigService } from '@nestjs/config';
-import { getOpenAiConfig } from '../configs/openAI';
+import { getOpenAiConfig } from '../configs/openAI.config';
 import { SubjectRepository } from '../subject/repositories/subject.repository';
 import { Subject } from '../subject/entities/subject.entity';
+import { TelegramModule } from '../telegram/telegram.module';
 // import { getOpenAiConfig } from '../configs/openAI';
 // import { ConfigService } from '@nestjs/config';
 
@@ -22,6 +23,7 @@ import { Subject } from '../subject/entities/subject.entity';
       inject: [ConfigService],
       useFactory: getOpenAiConfig,
     }),
+    TelegramModule,
   ],
   controllers: [QuestionController],
   providers: [

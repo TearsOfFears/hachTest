@@ -1,5 +1,6 @@
 import { OpenAIClient } from '@platohq/nestjs-openai';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CONSTANT_OPEN_AI } from '../constants/openAi.constants';
 
 @Injectable()
 export class OpenAIService {
@@ -8,14 +9,12 @@ export class OpenAIService {
   async createCompletion(prompt: string) {
     try {
       const { data } = await this.openAIClient.createCompletion({
-        model: 'text-davinci-003',
-        max_tokens: 1000,
-        temperature: 0.8,
+        ...CONSTANT_OPEN_AI,
         prompt,
       });
       return data;
-    } catch (e) {
-      console.log('err', e);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
 }

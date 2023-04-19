@@ -7,9 +7,3 @@ export interface IDatabaseConfigAttributes {
   dialect?: string;
   urlDatabase?: string;
 }
-
-export interface IDatabaseConfig {
-  development: IDatabaseConfigAttributes;
-  test: IDatabaseConfigAttributes;
-  production: IDatabaseConfigAttributes;
-}
