@@ -1,23 +1,27 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Telegraf } from 'telegraf';
-import { ITelegramOptions } from './telegram.interface';
-import { TELEGRAM_MODULE_OPTIONS } from './telegram.constants';
+import { Context, Telegraf } from 'telegraf';
+import { Update, Start, Hears, InjectBot } from 'nestjs-telegraf';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
+@Update()
 export class TelegramService {
-  bot: Telegraf;
-  options: ITelegramOptions;
+  constructor(@InjectBot() private readonly bot: Telegraf<Context>) {}
 
-  constructor(@Inject(TELEGRAM_MODULE_OPTIONS) options: ITelegramOptions) {
-    this.options = options;
-    this.bot = new Telegraf(options.token);
+  @Start()
+  async start(ctx: Context) {
+    const chatId = ctx.message.chat.id;
+    console.log('chatId', chatId);
+    await ctx.reply('Hello lox');
   }
-  async sendMessage(message: string, chatId: string = this.options.chatId) {
-    console.log('this.options.chatId', this.options);
-    try {
-      await this.bot.telegram.sendMessage(chatId, message);
-    } catch (e: any) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
-    }
+
+  async sendMessage(question: string, variants: string, ctx: Context) {
+    const chatId = ctx.message.chat.id;
+    await this.bot.telegram.sendMessage(chatId, question + variants);
+    // await ctx.reply(question + variants)
+  }
+
+  @Hears('hi')
+  async reply(ctx: Context) {
+    await ctx.reply(`You say ${ctx.message}`);
   }
 }

@@ -7,15 +7,15 @@ import { TelegramService } from '../telegram/telegram.service';
 @Controller('question')
 export class QuestionController {
   constructor(
-    public readonly questionService: QuestionService,
-    public readonly questionRepository: QuestionRepository,
+    private readonly questionService: QuestionService,
+    private readonly questionRepository: QuestionRepository,
     private readonly telegramService: TelegramService,
   ) {}
 
   @Post('create')
   async create(@Body() dtoIn: Omit<CreateDto, 'answerId'>) {
     const dtoOut = await this.questionService.createAndGetAnswer(dtoIn);
-    await this.telegramService.sendMessage('testttt');
+    // await this.telegramService.sendMessage('testttt', 'fff');
     return dtoOut;
   }
   @Get('find')

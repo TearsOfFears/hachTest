@@ -13,8 +13,8 @@ import { getOpenAiConfig } from '../configs/openAI.config';
 import { SubjectRepository } from '../subject/repositories/subject.repository';
 import { Subject } from '../subject/entities/subject.entity';
 import { TelegramModule } from '../telegram/telegram.module';
-// import { getOpenAiConfig } from '../configs/openAI';
-// import { ConfigService } from '@nestjs/config';
+import { TelegramService } from '../telegram/telegram.service';
+import { UserRepository } from '../auth/repositories/user.repository';
 
 @Module({
   imports: [
@@ -28,10 +28,12 @@ import { TelegramModule } from '../telegram/telegram.module';
   controllers: [QuestionController],
   providers: [
     QuestionService,
+    OpenAIService,
     AnswerRepository,
     QuestionRepository,
     SubjectRepository,
-    OpenAIService,
+    TelegramService,
+    // UserRepository,
   ],
   exports: [AnswerRepository, QuestionRepository],
 })
