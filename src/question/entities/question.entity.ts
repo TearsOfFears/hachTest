@@ -25,7 +25,7 @@ export class Question extends Model<Question> {
   question: string;
 
   @Column(DataType.ARRAY(DataType.STRING))
-  variants: string;
+  variants: string[];
 
   @BelongsTo(() => Answer)
   answer: Answer;

@@ -13,11 +13,15 @@ export class QuestionService {
   ) {}
 
   async createAndGetAnswer(dtoIn: CreateDto) {
+    let variantsParsed = '';
+    dtoIn.variants.forEach(
+      (el: string, inx: number) => (variantsParsed += `${inx + 1}. ${el}\n`),
+    );
     // const data = await this.openAIService.createCompletion(
-    //   dtoIn.question + dtoIn.variants,
+    //   dtoIn.question + variantsParsed,
     // );
     //data.choices[0].text
-    const answer = await this.answerRepository.create('fff');
+    const answer = await this.answerRepository.create('Some mock answer');
     dtoIn.answerId = answer.answerId;
     const question = await this.questionRepository.create(dtoIn);
     return { question, answer };

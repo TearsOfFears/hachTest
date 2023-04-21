@@ -1,4 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +22,16 @@ export class AuthService {
     dtoIn.passwordHash = hashSync(dtoIn.password, salt);
     delete dtoIn.password;
     return this.userRepository.create(dtoIn);
+  }
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.getByEmail(email);
+    if (!user) {
+      throw new HttpException(
+        'User with this email not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
   }
   // async validateUser(
   //   email: string,

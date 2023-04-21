@@ -15,15 +15,21 @@ import { Subject } from '../subject/entities/subject.entity';
 import { TelegramModule } from '../telegram/telegram.module';
 import { TelegramService } from '../telegram/telegram.service';
 import { UserRepository } from '../auth/repositories/user.repository';
+import { AuthModule } from '../auth/auth.module';
+import { User } from '../auth/entities/user.entity';
+import { AuthService } from '../auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Question, Answer, Subject]),
+    SequelizeModule.forFeature([Question, Answer, Subject, User]),
     OpenAIModule.registerAsync({
       inject: [ConfigService],
       useFactory: getOpenAiConfig,
     }),
     TelegramModule,
+    QuestionModule,
+    AuthModule,
   ],
   controllers: [QuestionController],
   providers: [
@@ -33,7 +39,8 @@ import { UserRepository } from '../auth/repositories/user.repository';
     QuestionRepository,
     SubjectRepository,
     TelegramService,
-    // UserRepository,
+    AuthService,
+    JwtService,
   ],
   exports: [AnswerRepository, QuestionRepository],
 })

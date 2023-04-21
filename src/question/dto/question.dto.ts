@@ -15,8 +15,11 @@ export class CreateDto {
   @IsString()
   question: string;
 
+  @IsString()
+  email: string;
+
   @IsArray({ each: true })
-  variants: string;
+  variants: string[];
 
   @IsString()
   subjectId: string;
