@@ -11,10 +11,9 @@ export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
       database: configService.get('DB_NAME_DEVELOPMENT'),
       autoLoadModels: true,
       synchronize: true,
-      native: true,
-      ssl: true,
       dialectOptions: {
         ssl: true,
+        native: true,
       },
     }),
     inject: [ConfigService],
