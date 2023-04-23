@@ -22,14 +22,14 @@ import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Question, Answer, Subject, User]),
+    SequelizeModule.forFeature([Question, Answer]),
     OpenAIModule.registerAsync({
       inject: [ConfigService],
       useFactory: getOpenAiConfig,
     }),
-    TelegramModule,
-    QuestionModule,
     AuthModule,
+    SequelizeModule,
+    TelegramModule,
   ],
   controllers: [QuestionController],
   providers: [
@@ -37,10 +37,6 @@ import { JwtService } from '@nestjs/jwt';
     OpenAIService,
     AnswerRepository,
     QuestionRepository,
-    SubjectRepository,
-    TelegramService,
-    AuthService,
-    JwtService,
   ],
   exports: [AnswerRepository, QuestionRepository],
 })

@@ -22,6 +22,9 @@ export class User extends Model<User> {
   @Column(DataType.STRING(150))
   passwordHash: string;
 
+  @Column(DataType.STRING(150))
+  refreshToken: string;
+
   @Column(DataType.BIGINT)
   chatId: number;
 }

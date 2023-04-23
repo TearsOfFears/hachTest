@@ -6,11 +6,13 @@ import {
   InjectBot,
   Message,
   Ctx,
+  Action,
   Use,
 } from 'nestjs-telegraf';
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { ContextTelegram } from './telegram.interface';
+import { actionButtons } from './telegram.buttons';
 
 @Injectable()
 @Update()
@@ -21,12 +23,15 @@ export class TelegramService {
   ) {}
 
   @Start()
-  async start(ctx: ContextTelegram) {
-    await ctx.reply('Hello student!');
+  async start(@Ctx() ctx: ContextTelegram) {
+    await ctx.reply(
+      'Hello student!This bot help you to read test page. Please, set up your email',
+      actionButtons(),
+    );
   }
-  @Hears('/email')
-  async wait(ctx: ContextTelegram) {
-    await ctx.reply(`Input email:`);
+  @Action('email')
+  async email(@Ctx() ctx: ContextTelegram) {
+    await ctx.reply(`Please, provide your valid email:`);
   }
   @Use()
   async reply(@Message('text') message: string, @Ctx() ctx: ContextTelegram) {
@@ -39,7 +44,7 @@ export class TelegramService {
     };
     await this.authService.create(userDto);
     await ctx.replyWithHTML(
-      `Your email and password:\nemail: ${ctx.message.text}\npassword: ${password}`,
+      `Your email and password for login to website:\nemail: ${ctx.message.text}\npassword: ${password}`,
     );
   }
   async sendMessage(
@@ -57,6 +62,5 @@ export class TelegramService {
       `Variants:\n${variantsParsed}\n` +
       `Answer: ${answer}`;
     await this.bot.telegram.sendMessage(chatId, answerParsed);
-    // await ctx.reply(question + variants)
   }
 }

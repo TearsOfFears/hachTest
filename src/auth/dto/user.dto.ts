@@ -12,3 +12,10 @@ export class CreateUserDto {
   @IsNumber()
   chatId?: number;
 }
+
+export class LoginUserDto {
+  @IsString()
+  email: string;
+  @IsString()
+  password: string;
+}

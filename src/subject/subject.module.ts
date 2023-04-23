@@ -9,6 +9,6 @@ import { SubjectRepository } from './repositories/subject.repository';
   imports: [SequelizeModule.forFeature([Subject])],
   controllers: [SubjectController],
   providers: [SubjectService, SubjectRepository],
-  exports: [SubjectRepository],
+  exports: [SubjectService, SubjectRepository],
 })
 export class SubjectModule {}
