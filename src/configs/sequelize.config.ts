@@ -1,6 +1,5 @@
 import { SequelizeModuleAsyncOptions } from '@nestjs/sequelize';
 import { ConfigService } from '@nestjs/config';
-
 export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
   return {
     useFactory: (configService: ConfigService) => ({
@@ -12,7 +11,11 @@ export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
       database: configService.get('DB_NAME_DEVELOPMENT'),
       autoLoadModels: true,
       synchronize: true,
+      native: true,
       ssl: true,
+      dialectOptions: {
+        ssl: true,
+      },
     }),
     inject: [ConfigService],
   };
