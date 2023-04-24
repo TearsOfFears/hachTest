@@ -13,7 +13,6 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
   async validate({ email }: Pick<User, 'email'>) {
-    console.log('email', email);
     return email;
   }
 }

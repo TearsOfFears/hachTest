@@ -10,15 +10,8 @@ import { OpenAIModule } from '@platohq/nestjs-openai';
 import { OpenAIService } from './services/openAI.service';
 import { ConfigService } from '@nestjs/config';
 import { getOpenAiConfig } from '../configs/openAI.config';
-import { SubjectRepository } from '../subject/repositories/subject.repository';
-import { Subject } from '../subject/entities/subject.entity';
 import { TelegramModule } from '../telegram/telegram.module';
-import { TelegramService } from '../telegram/telegram.service';
-import { UserRepository } from '../auth/repositories/user.repository';
 import { AuthModule } from '../auth/auth.module';
-import { User } from '../auth/entities/user.entity';
-import { AuthService } from '../auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -38,6 +31,11 @@ import { JwtService } from '@nestjs/jwt';
     AnswerRepository,
     QuestionRepository,
   ],
-  exports: [AnswerRepository, QuestionRepository],
+  exports: [
+    AnswerRepository,
+    QuestionRepository,
+    QuestionService,
+    OpenAIService,
+  ],
 })
 export class QuestionModule {}

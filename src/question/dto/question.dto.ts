@@ -7,6 +7,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { Question } from '../entities/question.entity';
+import { Answer } from '../entities/answer.entity';
 
 export class CreateDto {
   @IsString()
@@ -65,4 +66,9 @@ export class UpdateDto {
 export class FindAllOut {
   items: Question[];
   pageInfo: PageInfo;
+}
+
+export class CacheOut {
+  question: Question;
+  answer: Answer;
 }

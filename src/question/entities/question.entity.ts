@@ -21,7 +21,7 @@ export class Question extends Model<Question> {
   @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
   questionId: string;
 
-  @Column(DataType.STRING(10000))
+  @Column({ type: DataType.STRING(20000), unique: true })
   question: string;
 
   @Column(DataType.ARRAY(DataType.STRING))

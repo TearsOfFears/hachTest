@@ -46,8 +46,9 @@ export class QuestionRepository {
       },
     };
   }
-  async get(): Promise<Question> {
+  async getByQuestion(question: string): Promise<Question> {
     return await this.questionModel.findOne({
+      where: { question },
       include: [
         {
           model: Answer,
