@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { QuestionRepository } from '../repositories/question.repository';
 import { AnswerRepository } from '../repositories/answer.repository';
 import { OpenAIService } from './openAI.service';
-import { CacheOut, CreateDto } from '../dto/question.dto';
+import { CreateDto } from '../dto/question.dto';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 @Injectable()

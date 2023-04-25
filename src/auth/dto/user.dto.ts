@@ -19,3 +19,8 @@ export class LoginUserDto {
   @IsString()
   password: string;
 }
+
+export class EmailCheckDto {
+  @IsString()
+  email: string;
+}

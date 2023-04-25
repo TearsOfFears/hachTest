@@ -6,8 +6,10 @@ import {
   BadRequestException,
   Req,
   Res,
+  Param,
+  Get,
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from './dto/user.dto';
+import { CreateUserDto, EmailCheckDto, LoginUserDto } from './dto/user.dto';
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
@@ -40,6 +42,11 @@ export class AuthController {
       httpOnly: true,
     });
     return user;
+  }
+  @HttpCode(200)
+  @Get('emailCheck/:email')
+  async emailCheck(@Param('email') email: string) {
+    return this.authService.getUserByEmail(email);
   }
   @HttpCode(200)
   @Post('refreshToken')

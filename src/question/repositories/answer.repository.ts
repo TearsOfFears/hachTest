@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Answer } from '../entities/answer.entity';
-import { Question } from '../entities/question.entity';
 
 @Injectable()
 export class AnswerRepository {
@@ -9,7 +8,7 @@ export class AnswerRepository {
     @InjectModel(Answer) private readonly answerModel: typeof Answer,
   ) {}
 
-  async create(answerChatGpt: string) {
+  async create(answerChatGpt: string): Promise<Answer> {
     return await this.answerModel.create({
       answerChatGpt,
     });

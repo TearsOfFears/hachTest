@@ -67,8 +67,3 @@ export class FindAllOut {
   items: Question[];
   pageInfo: PageInfo;
 }
-
-export class CacheOut {
-  question: Question;
-  answer: Answer;
-}
