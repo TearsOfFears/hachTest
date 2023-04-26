@@ -8,12 +8,15 @@ import {
   Res,
   Param,
   Get,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto, EmailCheckDto, LoginUserDto } from './dto/user.dto';
+import { CreateUserDto, LoginUserDto } from './dto/user.dto';
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
 import { ITokens } from './dto/tokens.dto';
+import { JwtGuard } from '../guards/jwt.guard';
+import { FindDto } from '../question/dto/question.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +41,13 @@ export class AuthController {
   ) {
     await this.authService.validateUser(dtoIn.email, dtoIn.password);
     const user = await this.authService.login(dtoIn.email);
-    response.cookie('jwt_refresh', user.refresh_token, {
+    response.cookie('refreshToken', user.refreshToken, {
       httpOnly: true,
     });
-    return user;
+    return {
+      ...user.userUpdated,
+      accessToken: user.accessToken,
+    };
   }
   @HttpCode(200)
   @Get('emailCheck/:email')
@@ -55,10 +61,17 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const dtoOut: ITokens = await this.authService.refreshTokens(
-      request.cookies.jwt_refresh,
+      request.cookies.refreshToken,
     );
-    response.cookie('jwt_refresh', dtoOut.refreshToken, {
+    response.cookie('refreshToken', dtoOut.refreshToken, {
       httpOnly: true,
     });
+    return { accessToken: dtoOut.accessToken };
+  }
+  // @UseGuards(JwtGuard)
+  @Get('find')
+  async find(@Body() dtoIn) {
+    const a = await this.userRepository.findAll(dtoIn);
+    return a;
   }
 }

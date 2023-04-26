@@ -7,8 +7,10 @@ import {
   ForeignKey,
   HasMany,
   HasOne,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Question } from '../../question/entities/question.entity';
+import { University } from '../../university/entities/university.entity';
 
 @Table({
   timestamps: true,
@@ -23,9 +25,13 @@ export class Subject extends Model {
   @Column(DataType.STRING(250))
   title: string;
 
-  @Column(DataType.STRING(20000))
-  university: string;
-
   @HasMany(() => Question)
   question: Question[];
+
+  @BelongsTo(() => University)
+  university: University;
+
+  @ForeignKey(() => University)
+  @Column({ type: DataType.UUID })
+  universityId: string;
 }

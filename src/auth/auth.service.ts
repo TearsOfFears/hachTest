@@ -27,8 +27,8 @@ export class AuthService {
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
     return {
       user,
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
   async refreshTokens(refreshToken: string): Promise<ITokens> {
@@ -36,7 +36,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     const userDataValidate = this.jwtService.verify(refreshToken, {
-      secret: this.configService.get('refresh123'),
+      secret: this.configService.get('JWT_SECRET_REFRESH'),
     });
     const user = await this.userRepository.getByEmail(userDataValidate.email);
     if (!userDataValidate || !user) {
@@ -83,13 +83,13 @@ export class AuthService {
     );
     return {
       userUpdated,
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
   async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this.hashData(refreshToken);
-    await this.userRepository.updateByUserId(userId, hashedRefreshToken);
+    return await this.userRepository.updateByUserId(userId, hashedRefreshToken);
   }
   async getTokens(userId: string, email: string): Promise<ITokens> {
     const [accessToken, refreshToken] = await Promise.all([
@@ -102,7 +102,10 @@ export class AuthService {
           userId,
           email,
         },
-        { expiresIn: '1h' },
+        {
+          expiresIn: '1h',
+          secret: this.configService.get('JWT_SECRET_REFRESH'),
+        },
       ),
     ]);
     return {

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get } from '@nestjs/common';
 import { SubjectRepository } from './repositories/subject.repository';
 
 @Controller('subject')
@@ -7,7 +7,11 @@ export class SubjectController {
 
   @Post('create')
   async create(@Body() dtoIn) {
-    const a = await this.subjectRepository.create(dtoIn);
+    return await this.subjectRepository.create(dtoIn);
+  }
+  @Get('find')
+  async find(@Body() dtoIn) {
+    const a = await this.subjectRepository.findAll(dtoIn);
     return a;
   }
 }

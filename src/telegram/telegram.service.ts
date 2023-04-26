@@ -41,6 +41,7 @@ export class TelegramService {
       email: ctx.message.text,
       password,
       chatId: ctx.message.chat.id,
+      universityId: ctx.message.chat.id,
     };
     await this.authService.create(userDto);
     await ctx.replyWithHTML(

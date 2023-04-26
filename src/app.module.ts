@@ -6,6 +6,7 @@ import { QuestionModule } from './question/question.module';
 import { SubjectModule } from './subject/subject.module';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UniversityModule } from './university/university.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     QuestionModule,
     SubjectModule,
     AuthModule,
+    UniversityModule,
   ],
 })
 export class AppModule {}
