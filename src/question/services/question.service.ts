@@ -23,11 +23,10 @@ export class QuestionService {
     dtoIn.variants.forEach(
       (el: string, inx: number) => (variantsParsed += `${inx + 1}. ${el}\n`),
     );
-    // const data = await this.openAIService.createCompletion(
-    //   dtoIn.question + variantsParsed,
-    // );
-    //data.choices[0].text
-    const answer = await this.answerRepository.create('data.choices[0].text');
+    const data = await this.openAIService.createCompletion(
+      dtoIn.question + variantsParsed,
+    );
+    const answer = await this.answerRepository.create(data.choices[0].text);
     dtoIn.answerId = answer.answerId;
     let question;
     try {
