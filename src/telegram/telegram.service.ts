@@ -29,6 +29,10 @@ export class TelegramService {
       actionButtons(),
     );
   }
+  @Action('university')
+  async university(@Ctx() ctx: ContextTelegram) {
+    await ctx.reply(`Please, provide your valid email:`);
+  }
   @Action('email')
   async email(@Ctx() ctx: ContextTelegram) {
     await ctx.reply(`Please, provide your valid email:`);

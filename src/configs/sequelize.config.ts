@@ -12,6 +12,9 @@ export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
       autoLoadModels: true,
       synchronize: true,
       dialectOptions: {
+        options: {
+          encrypt: true,
+        },
         ssl: {
           require: true,
           rejectUnauthorized: false,
