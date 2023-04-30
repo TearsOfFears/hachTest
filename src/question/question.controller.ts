@@ -23,7 +23,7 @@ export class QuestionController {
     private readonly telegramService: TelegramService,
     private readonly authService: AuthService,
   ) {}
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   @UsePipes(new TextTransformPipe())
   @Post('create')
   async create(@Body() dtoIn: Omit<CreateDto, 'answerId'>) {
