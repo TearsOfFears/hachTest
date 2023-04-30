@@ -26,7 +26,7 @@ export class AuthService {
     const tokens = await this.getTokens(user.userId, user.email);
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
     return {
-      user,
+      ...user.dataValues,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
@@ -35,11 +35,16 @@ export class AuthService {
     if (!refreshToken) {
       throw new UnauthorizedException();
     }
-    const userDataValidate = this.jwtService.verify(refreshToken, {
-      secret: this.configService.get('JWT_SECRET_REFRESH'),
-    });
+    let userDataValidate;
+    try {
+      userDataValidate = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get('JWT_SECRET_REFRESH'),
+      });
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
     const user = await this.userRepository.getByEmail(userDataValidate.email);
-    if (!userDataValidate || !user) {
+    if (!user) {
       throw new UnauthorizedException();
     }
     const tokens = await this.getTokens(user.userId, user.email);

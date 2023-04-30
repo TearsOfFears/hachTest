@@ -9,14 +9,16 @@ import {
   Param,
   Get,
   UseGuards,
+  Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from './dto/user.dto';
+import { CreateUserDto, FindDto, LoginUserDto } from './dto/user.dto';
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
 import { ITokens } from './dto/tokens.dto';
 import { JwtGuard } from '../guards/jwt.guard';
-import { FindDto } from '../question/dto/question.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +31,7 @@ export class AuthController {
   async register(@Body() dtoIn: CreateUserDto) {
     const oldUser = await this.userRepository.getByEmail(dtoIn.email);
     if (oldUser) {
-      throw new BadRequestException('User with this email aldready exist');
+      throw new BadRequestException('User with this email already exist');
     }
     return this.authService.create(dtoIn);
   }
@@ -68,10 +70,18 @@ export class AuthController {
     });
     return { accessToken: dtoOut.accessToken };
   }
-  // @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @Get('find')
-  async find(@Body() dtoIn) {
-    const a = await this.userRepository.findAll(dtoIn);
-    return a;
+  async find(@Body() dtoIn: FindDto) {
+    return await this.userRepository.findAll(dtoIn);
+  }
+  @Get(':userId')
+  async getById(@Param('userId') userId: string) {
+    // console.log(dtoIn.pageSize);
+    const user = await this.userRepository.getByUserId(userId);
+    if (!user) {
+      throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
+    }
+    return user;
   }
 }

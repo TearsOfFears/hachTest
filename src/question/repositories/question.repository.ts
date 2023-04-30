@@ -3,9 +3,10 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Question } from '../entities/question.entity';
 import { Answer } from '../entities/answer.entity';
 import { Subject } from '../../subject/entities/subject.entity';
-import { FindAllOut, FindDto } from '../dto/question.dto';
+import { FindDto } from '../dto/question.dto';
 import { CreateDto } from '../dto/answer.dto';
 import { FindOptions } from 'sequelize';
+import { IFindAllOut } from '../interfaces/question.interface';
 @Injectable()
 export class QuestionRepository {
   constructor(
@@ -14,7 +15,7 @@ export class QuestionRepository {
   async create(dtoIn: CreateDto): Promise<Question> {
     return await this.questionModel.create(dtoIn);
   }
-  async findAll(dtoIn: FindDto): Promise<FindAllOut> {
+  async findAll(dtoIn: FindDto): Promise<IFindAllOut> {
     const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;
     const limit: number = dtoIn.pageInfo.pageSize;
 

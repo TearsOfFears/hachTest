@@ -1,13 +1,29 @@
 version: "3.3"
 services:
+  api_hack:
+    container_name: api_hack
+    build:
+      context: .
+    env_file:
+      - ./.env
+    volumes:
+      - ./src:/app/src
+    ports:
+      - 4444:4444
+    expose:
+      - 4444
+    depends_on:
+      - postgres
+    restart: always
   postgres:
     container_name: postgres
     image: postgres:12
     environment:
-      PG_DATA: /var/lib/postgresql/data
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: hackTest
+      PG_DATA: /var/lib/postgresql/data
     volumes:
       - hackTest:/var/lib/postgresql/data
     ports:

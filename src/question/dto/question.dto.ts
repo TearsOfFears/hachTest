@@ -62,8 +62,3 @@ export class UpdateDto {
   @IsString()
   subjectId: string;
 }
-
-export class FindAllOut {
-  items: Question[];
-  pageInfo: PageInfo;
-}

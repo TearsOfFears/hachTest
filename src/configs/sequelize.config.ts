@@ -11,13 +11,13 @@ export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
       database: configService.get('DB_NAME_DEVELOPMENT'),
       autoLoadModels: true,
       synchronize: true,
-      // dialectOptions: {
-      //   ssl: {
-      //     require: true,
-      //     rejectUnauthorized: false,
-      //   },
-      //   native: true,
-      // },
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+        native: true,
+      },
     }),
     inject: [ConfigService],
   };

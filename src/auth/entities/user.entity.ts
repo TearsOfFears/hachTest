@@ -15,6 +15,19 @@ import { Question } from '../../question/entities/question.entity';
   timestamps: true,
   createdAt: true,
   updatedAt: true,
+  defaultScope: {
+    attributes: {
+      exclude: ['passwordHash', 'refreshToken'],
+    },
+    order: [['userId', 'DESC']],
+  },
+  scopes: {
+    withPasswordAndRefresh: {
+      attributes: {
+        include: ['passwordHash', 'refreshToken'],
+      },
+    },
+  },
 })
 export class User extends Model<User> {
   @PrimaryKey
@@ -23,6 +36,9 @@ export class User extends Model<User> {
 
   @Column(DataType.STRING(150))
   email: string;
+
+  @Column(DataType.STRING(20))
+  name: string;
 
   @BelongsTo(() => University)
   university: University;
