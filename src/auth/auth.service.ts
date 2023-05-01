@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -20,6 +21,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async create(dtoIn: CreateUserDto) {
+    const oldUser = await this.userRepository.getByEmail(dtoIn.email);
+    if (oldUser) {
+      throw new BadRequestException('User with this email already exist');
+    }
     dtoIn.passwordHash = this.hashData(dtoIn.password);
     delete dtoIn.password;
     const user = await this.userRepository.create(dtoIn);

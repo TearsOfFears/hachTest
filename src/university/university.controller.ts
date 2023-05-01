@@ -16,7 +16,6 @@ export class UniversityController {
   }
   @Get('find')
   async find(@Query() dtoIn: FindDto) {
-    // console.log(dtoIn.pageSize);
     return await this.universityRepository.findAll(dtoIn);
   }
 }

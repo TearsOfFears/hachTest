@@ -29,10 +29,6 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() dtoIn: CreateUserDto) {
-    const oldUser = await this.userRepository.getByEmail(dtoIn.email);
-    if (oldUser) {
-      throw new BadRequestException('User with this email already exist');
-    }
     return this.authService.create(dtoIn);
   }
   @HttpCode(200)

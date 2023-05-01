@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getTelegramConfig } from '../configs/telegram.config';
 import { TelegramService } from './telegram.service';
 import { AuthModule } from '../auth/auth.module';
+import { UniversityModule } from '../university/university.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from '../auth/auth.module';
       inject: [ConfigService],
     }),
     AuthModule,
+    UniversityModule,
   ],
   providers: [TelegramService],
   exports: [TelegramService],

@@ -13,7 +13,8 @@ export class CreateUserDto {
   @IsOptional()
   passwordHash?: string;
   @IsNumber()
-  chatId?: number;
+  @IsOptional()
+  chatId?: number | null;
 }
 export class PageInfo {
   @IsNumber()
