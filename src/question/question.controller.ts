@@ -5,7 +5,6 @@ import {
   Get,
   UseGuards,
   UsePipes,
-  UseInterceptors,
 } from '@nestjs/common';
 import { QuestionService } from './services/question.service';
 import { CreateDto, FindDto } from './dto/question.dto';

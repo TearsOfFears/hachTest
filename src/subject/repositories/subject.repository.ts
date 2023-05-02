@@ -15,8 +15,9 @@ export class SubjectRepository {
   async create(dtoIn): Promise<Subject> {
     return this.subjectModel.create(dtoIn);
   }
-  async getByTitle(title: string): Promise<Subject> {
-    return this.subjectModel.findOne({ where: { title } });
+  async getByTitle(title: string): Promise<Subject | null> {
+    const subject = await this.subjectModel.findOne({ where: { title } });
+    return subject?.dataValues;
   }
   async getBySubjectId(subjectId: string): Promise<Subject> {
     return this.subjectModel.findByPk(subjectId);

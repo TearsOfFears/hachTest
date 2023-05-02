@@ -1,4 +1,5 @@
 import { User } from '../entities/user.entity';
+import { ITokens } from '../dto/tokens.dto';
 
 export interface IUser {
   name?: string;
@@ -25,4 +26,9 @@ export interface IFind {
 export interface IFindAllOut {
   items: User[];
   pageInfo: PageInfo;
+}
+
+export interface IRefreshUser {
+  user: User;
+  tokens: ITokens;
 }

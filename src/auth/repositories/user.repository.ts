@@ -20,12 +20,12 @@ export class UserRepository {
   async getByUserId(userId: string): Promise<User | null> {
     return this.userModel.findByPk(userId);
   }
-  async updateByUserId(userId: string, token: string) {
-    const [_, user] = await this.userModel.update<User>(
-      { refreshToken: token },
-      { where: { userId }, returning: true },
-    );
-    return user[0].dataValues;
+  async updateByUserId(userId: string, fiedlUpdate: any) {
+    const [_, user] = await this.userModel.update<User>(fiedlUpdate, {
+      where: { userId },
+      returning: true,
+    });
+    return user[0]?.dataValues;
   }
   async findAll(dtoIn: IFind): Promise<IFindAllOut> {
     const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;

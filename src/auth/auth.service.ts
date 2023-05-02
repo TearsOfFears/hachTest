@@ -12,6 +12,7 @@ import { User } from './entities/user.entity';
 import { UserRepository } from './repositories/user.repository';
 import { ConfigService } from '@nestjs/config';
 import { ITokens } from './dto/tokens.dto';
+import { IRefreshUser } from './interfaces/user.interaface';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
       refreshToken: tokens.refreshToken,
     };
   }
-  async refreshTokens(refreshToken: string): Promise<ITokens> {
+  async refreshTokens(refreshToken: string): Promise<IRefreshUser> {
     if (!refreshToken) {
       throw new UnauthorizedException();
     }
@@ -54,7 +55,7 @@ export class AuthService {
     }
     const tokens = await this.getTokens(user.userId, user.email);
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
-    return tokens;
+    return { user, tokens };
   }
   async getUserByEmail(email: string): Promise<User> {
     const user = await this.userRepository.getByEmail(email);
@@ -91,15 +92,24 @@ export class AuthService {
       user.userId,
       tokens.refreshToken,
     );
+    delete userUpdated.refreshToken;
+    delete userUpdated.passwordHash;
     return {
       userUpdated,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
   }
+  async logout(userId: string) {
+    await this.userRepository.updateByUserId(userId, {
+      refreshToken: null,
+    });
+  }
   async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this.hashData(refreshToken);
-    return await this.userRepository.updateByUserId(userId, hashedRefreshToken);
+    return await this.userRepository.updateByUserId(userId, {
+      refreshToken: hashedRefreshToken,
+    });
   }
   async getTokens(userId: string, email: string): Promise<ITokens> {
     const [accessToken, refreshToken] = await Promise.all([
@@ -113,7 +123,7 @@ export class AuthService {
           email,
         },
         {
-          expiresIn: '1h',
+          expiresIn: '5m',
           secret: this.configService.get('JWT_SECRET_REFRESH'),
         },
       ),

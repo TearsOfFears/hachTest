@@ -56,6 +56,10 @@ export class LoginUserDto {
   password: string;
 }
 
+export class LogoutUserDto {
+  @IsUUID()
+  userId: string;
+}
 export class EmailCheckDto {
   @IsString()
   email: string;

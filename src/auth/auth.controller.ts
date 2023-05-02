@@ -11,12 +11,18 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { CreateUserDto, FindDto, LoginUserDto } from './dto/user.dto';
+import {
+  CreateUserDto,
+  FindDto,
+  LoginUserDto,
+  LogoutUserDto,
+} from './dto/user.dto';
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
 import { ITokens } from './dto/tokens.dto';
 import { JwtGuard } from '../guards/jwt.guard';
+import { IRefreshUser } from './interfaces/user.interaface';
 
 @Controller('auth')
 export class AuthController {
@@ -26,8 +32,15 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() dtoIn: CreateUserDto) {
-    return this.authService.create(dtoIn);
+  async register(
+    @Body() dtoIn: CreateUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const user = await this.authService.create(dtoIn);
+    response.cookie('refreshToken', user.refreshToken, {
+      httpOnly: true,
+    });
+    return user;
   }
   @HttpCode(200)
   @Post('login')
@@ -39,6 +52,7 @@ export class AuthController {
     const user = await this.authService.login(dtoIn.email);
     response.cookie('refreshToken', user.refreshToken, {
       httpOnly: true,
+      domain: 'http://127.0.0.1/',
     });
     return {
       ...user.userUpdated,
@@ -46,29 +60,39 @@ export class AuthController {
     };
   }
   @HttpCode(200)
+  @Post('logout')
+  async logout(
+    @Body() dtoIn: LogoutUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.logout(dtoIn.userId);
+    response.clearCookie('refreshToken');
+  }
+  @HttpCode(200)
   @Get('emailCheck/:email')
   async emailCheck(@Param('email') email: string) {
     return this.authService.getUserByEmail(email);
   }
   @HttpCode(200)
-  @Post('refreshToken')
+  @Post('refresh')
   async refreshToken(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const dtoOut: ITokens = await this.authService.refreshTokens(
+    const { user, tokens }: IRefreshUser = await this.authService.refreshTokens(
       request.cookies.refreshToken,
     );
-    response.cookie('refreshToken', dtoOut.refreshToken, {
+    response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
     });
-    return { accessToken: dtoOut.accessToken };
+    return { user, accessToken: tokens.accessToken };
   }
   @UseGuards(JwtGuard)
   @Get('find')
   async find(@Body() dtoIn: FindDto) {
     return await this.userRepository.findAll(dtoIn);
   }
+  @UseGuards(JwtGuard)
   @Get(':userId')
   async getById(@Param('userId') userId: string) {
     // console.log(dtoIn.pageSize);

@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { SubjectRepository } from './repositories/subject.repository';
 import { CreateSubjectDto } from './dto/subject.dto';
 
@@ -21,5 +29,14 @@ export class SubjectController {
   @Get('getById/:subjectId')
   async getById(@Param('subjectId') subjectId) {
     return this.subjectRepository.getBySubjectId(subjectId);
+  }
+  @Get('getByTitle/:title')
+  async getByTitle(@Param('title') title) {
+    console.log('title', title);
+    const subject = await this.subjectRepository.getByTitle(title);
+    if (!subject) {
+      throw new HttpException('Not exist', HttpStatus.BAD_REQUEST);
+    }
+    return subject;
   }
 }
