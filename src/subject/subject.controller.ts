@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Get,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { SubjectRepository } from './repositories/subject.repository';
 import { CreateSubjectDto } from './dto/subject.dto';
 
@@ -24,5 +17,9 @@ export class SubjectController {
   @Get('find')
   async find(@Body() dtoIn) {
     return this.subjectRepository.findAll(dtoIn);
+  }
+  @Get('getById/:subjectId')
+  async getById(@Param('subjectId') subjectId) {
+    return this.subjectRepository.getBySubjectId(subjectId);
   }
 }

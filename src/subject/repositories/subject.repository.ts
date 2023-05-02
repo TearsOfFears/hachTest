@@ -18,6 +18,9 @@ export class SubjectRepository {
   async getByTitle(title: string): Promise<Subject> {
     return this.subjectModel.findOne({ where: { title } });
   }
+  async getBySubjectId(subjectId: string): Promise<Subject> {
+    return this.subjectModel.findByPk(subjectId);
+  }
   async findAll(dtoIn: IFind): Promise<IFindAllOut> {
     const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;
     const limit: number = dtoIn.pageInfo.pageSize;
