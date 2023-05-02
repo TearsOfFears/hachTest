@@ -7,22 +7,13 @@ import {
   IsUUID,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateSubjectDto {
   @IsString()
-  name?: string;
-  @IsEmail()
-  email: string;
+  title: string;
   @IsUUID()
   universityId: string;
-  @IsString()
-  password?: string;
-  @IsString()
-  @IsOptional()
-  passwordHash?: string;
-  @IsNumber()
-  @IsOptional()
-  chatId?: number | null;
 }
+
 export class PageInfo {
   @IsNumber()
   pageSize: number;
@@ -60,5 +51,3 @@ export class EmailCheckDto {
   @IsString()
   email: string;
 }
-
-export type UserCredentians = CreateUserDto & 'refreshToken';

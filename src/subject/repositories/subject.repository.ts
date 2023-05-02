@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Subject } from '../entities/subject.entity';
 import { FindOptions } from 'sequelize';
-import { Answer } from '../../question/entities/answer.entity';
-import { Question } from '../../question/entities/question.entity';
 import { University } from '../../university/entities/university.entity';
 import { IFind, IFindAllOut } from '../interfaces/subject.interaface';
+import { CreateSubjectDto } from '../dto/subject.dto';
 
 @Injectable()
 export class SubjectRepository {
@@ -13,8 +12,11 @@ export class SubjectRepository {
     @InjectModel(Subject) private readonly subjectModel: typeof Subject,
   ) {}
 
-  async create(dtoIn) {
-    return await this.subjectModel.create(dtoIn);
+  async create(dtoIn): Promise<Subject> {
+    return this.subjectModel.create(dtoIn);
+  }
+  async getByTitle(title: string): Promise<Subject> {
+    return this.subjectModel.findOne({ where: { title } });
   }
   async findAll(dtoIn: IFind): Promise<IFindAllOut> {
     const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;
