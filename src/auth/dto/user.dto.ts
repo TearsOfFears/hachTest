@@ -6,6 +6,8 @@ import {
   IsEmail,
   IsUUID,
 } from 'class-validator';
+import { User } from '../entities/user.entity';
+import { ITokens } from './tokens.dto';
 
 export class CreateUserDto {
   @IsString()

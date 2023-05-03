@@ -20,9 +20,9 @@ import {
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
-import { ITokens } from './dto/tokens.dto';
 import { JwtGuard } from '../guards/jwt.guard';
 import { IRefreshUser } from './interfaces/user.interaface';
+import { RegisterUserDto } from './dtoOut/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +38,15 @@ export class AuthController {
   ) {
     const user = await this.authService.create(dtoIn);
     response.cookie('refreshToken', user.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      sameSite: 'none',
+      secure: true,
     });
+    delete user.refreshToken;
     return user;
   }
+  //: Promise<RegisterUserDto>
   @HttpCode(200)
   @Post('login')
   async login(
@@ -51,8 +56,10 @@ export class AuthController {
     await this.authService.validateUser(dtoIn.email, dtoIn.password);
     const user = await this.authService.login(dtoIn.email);
     response.cookie('refreshToken', user.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      domain: 'http://127.0.0.1/',
+      sameSite: 'none',
+      secure: true,
     });
     return {
       ...user.userUpdated,
@@ -73,8 +80,9 @@ export class AuthController {
   async emailCheck(@Param('email') email: string) {
     return this.authService.getUserByEmail(email);
   }
+
   @HttpCode(200)
-  @Post('refresh')
+  @Get('refresh')
   async refreshToken(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -82,11 +90,15 @@ export class AuthController {
     const { user, tokens }: IRefreshUser = await this.authService.refreshTokens(
       request.cookies.refreshToken,
     );
-    response.cookie('refreshToken', tokens.refreshToken, {
+    response.cookie('refreshToken', user.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      sameSite: 'none',
+      secure: true,
     });
-    return { user, accessToken: tokens.accessToken };
+    return { accessToken: tokens.accessToken, ...user };
   }
+
   @UseGuards(JwtGuard)
   @Get('find')
   async find(@Body() dtoIn: FindDto) {

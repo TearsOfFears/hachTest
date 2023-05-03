@@ -3,19 +3,23 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../entities/user.entity';
 import { FindOptions } from 'sequelize';
 import { University } from '../../university/entities/university.entity';
-import { IFind, IFindAllOut, IUser } from '../interfaces/user.interaface';
+import { IFind, IFindAllOut } from '../interfaces/user.interaface';
 
 @Injectable()
 export class UserRepository {
   constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   async create(dto): Promise<User> {
-    return this.userModel.scope('withPasswordAndRefresh').create(dto);
+    const user = await this.userModel
+      .scope('withPasswordAndRefresh')
+      .create(dto);
+    return user?.dataValues;
   }
   async getByEmail(email: string): Promise<User | null> {
-    return this.userModel
+    const user = await this.userModel
       .scope('withPasswordAndRefresh')
       .findOne({ where: { email } });
+    return user?.dataValues;
   }
   async getByUserId(userId: string): Promise<User | null> {
     return this.userModel.findByPk(userId);

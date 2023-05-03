@@ -13,6 +13,7 @@ import { UserRepository } from './repositories/user.repository';
 import { ConfigService } from '@nestjs/config';
 import { ITokens } from './dto/tokens.dto';
 import { IRefreshUser } from './interfaces/user.interaface';
+import { RegisterUserDto } from './dtoOut/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,14 +33,14 @@ export class AuthService {
     const tokens = await this.getTokens(user.userId, user.email);
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
     return {
-      ...user.dataValues,
+      ...user,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
   }
   async refreshTokens(refreshToken: string): Promise<IRefreshUser> {
     if (!refreshToken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Refresh token doest not present');
     }
     let userDataValidate;
     try {
@@ -47,11 +48,11 @@ export class AuthService {
         secret: this.configService.get('JWT_SECRET_REFRESH'),
       });
     } catch (e) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Token expire');
     }
     const user = await this.userRepository.getByEmail(userDataValidate.email);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Not found user');
     }
     const tokens = await this.getTokens(user.userId, user.email);
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
@@ -105,7 +106,10 @@ export class AuthService {
       refreshToken: null,
     });
   }
-  async updateRefreshToken(userId: string, refreshToken: string) {
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<User> {
     const hashedRefreshToken = await this.hashData(refreshToken);
     return await this.userRepository.updateByUserId(userId, {
       refreshToken: hashedRefreshToken,
