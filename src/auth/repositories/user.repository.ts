@@ -24,7 +24,7 @@ export class UserRepository {
   async getByUserId(userId: string): Promise<User | null> {
     return this.userModel.findByPk(userId);
   }
-  async updateByUserId(userId: string, fiedlUpdate: any) {
+  async updateByUserId(userId: string, fiedlUpdate: any): Promise<User> {
     const [_, user] = await this.userModel.update<User>(fiedlUpdate, {
       where: { userId },
       returning: true,

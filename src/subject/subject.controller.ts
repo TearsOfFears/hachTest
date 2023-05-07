@@ -6,9 +6,11 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { SubjectRepository } from './repositories/subject.repository';
 import { CreateSubjectDto } from './dto/subject.dto';
+import { FindDto } from '../subject/dto/subject.dto';
 
 @Controller('subject')
 export class SubjectController {
@@ -23,7 +25,7 @@ export class SubjectController {
     return await this.subjectRepository.create(dtoIn);
   }
   @Get('find')
-  async find(@Body() dtoIn) {
+  async find(@Query() dtoIn: FindDto) {
     return this.subjectRepository.findAll(dtoIn);
   }
   @Get('getById/:subjectId')

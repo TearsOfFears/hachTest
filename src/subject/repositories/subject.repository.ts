@@ -4,7 +4,7 @@ import { Subject } from '../entities/subject.entity';
 import { FindOptions } from 'sequelize';
 import { University } from '../../university/entities/university.entity';
 import { IFind, IFindAllOut } from '../interfaces/subject.interaface';
-import { CreateSubjectDto } from '../dto/subject.dto';
+import { CreateSubjectDto, FindDto } from '../dto/subject.dto';
 
 @Injectable()
 export class SubjectRepository {
@@ -22,9 +22,9 @@ export class SubjectRepository {
   async getBySubjectId(subjectId: string): Promise<Subject> {
     return this.subjectModel.findByPk(subjectId);
   }
-  async findAll(dtoIn: IFind): Promise<IFindAllOut> {
-    const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;
-    const limit: number = dtoIn.pageInfo.pageSize;
+  async findAll(dtoIn: FindDto): Promise<IFindAllOut> {
+    const offset: number = dtoIn.pageSize * dtoIn.pageIndex;
+    const limit: number = dtoIn.pageSize;
 
     const options: FindOptions = {
       limit,
@@ -37,17 +37,17 @@ export class SubjectRepository {
       ],
     };
 
-    // if (dtoIn.subjectId) {
-    //   options.where = { subjectId: dtoIn.subjectId };
-    // }
+    if (dtoIn.universityId) {
+      options.where = { universityId: dtoIn.universityId };
+    }
 
     const items: Subject[] = await this.subjectModel.findAll(options);
     return {
       items,
       pageInfo: {
         pageTotal: items.length,
-        pageSize: dtoIn.pageInfo.pageSize,
-        pageIndex: dtoIn.pageInfo.pageIndex,
+        pageSize: dtoIn.pageSize,
+        pageIndex: dtoIn.pageIndex,
       },
     };
   }

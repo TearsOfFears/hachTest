@@ -26,8 +26,10 @@ export class PageInfo {
 }
 
 export class FindDto {
-  @IsObject({ each: true })
-  pageInfo: PageInfo;
+  @IsNumber()
+  pageSize: number;
+  @IsNumber()
+  pageIndex: number;
 
   @IsString()
   @IsString({ each: true })

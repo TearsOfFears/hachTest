@@ -128,7 +128,7 @@ export class AuthService {
           email,
         },
         {
-          expiresIn: '5m',
+          expiresIn: '1h',
           secret: this.configService.get('JWT_SECRET_REFRESH'),
         },
       ),

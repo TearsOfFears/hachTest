@@ -1,4 +1,4 @@
-import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateDto {
   @IsString()
@@ -16,19 +16,20 @@ export class PageInfo {
 }
 
 export class FindDto {
-  // @IsNumber()
-  // pageSize: number;
-  // @IsNumber()
-  // pageIndex: number;
+  @IsInt()
+  @IsOptional()
+  pageSize?: number;
+  @IsInt()
+  pageIndex?: number;
 
   @IsString()
   @IsString({ each: true })
-  sortBy: string;
+  sortBy?: string;
 
   @IsString()
-  order: string;
+  order?: string;
 
   @IsString()
   @IsOptional()
-  subjectId: string;
+  subjectId?: string;
 }

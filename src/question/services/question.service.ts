@@ -5,6 +5,7 @@ import { OpenAIService } from './openAI.service';
 import { CreateDto } from '../dto/question.dto';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class QuestionService {
   constructor(
@@ -12,6 +13,7 @@ export class QuestionService {
     public readonly questionRepository: QuestionRepository,
     public readonly answerRepository: AnswerRepository,
     public readonly openAIService: OpenAIService,
+    public readonly configService: ConfigService,
   ) {}
 
   async createAndGetAnswer(dtoIn: CreateDto) {
@@ -23,20 +25,32 @@ export class QuestionService {
     dtoIn.variants.forEach(
       (el: string, inx: number) => (variantsParsed += `${inx + 1}. ${el}\n`),
     );
-    // const data = await this.openAIService.createCompletion(
-    //   dtoIn.question + variantsParsed,
-    // );
-    //data.choices[0].text
-    const answer = await this.answerRepository.create('data.choices[0].text');
+    let answer;
+    // ONLY FOR DEV PUPROSE
+    if (this.configService.get('ENV') === 'PROD') {
+      const data = await this.openAIService.createCompletion(
+        dtoIn.question + variantsParsed,
+      );
+      answer = await this.answerRepository.create(data.choices[0].text);
+    } else {
+      answer = await this.answerRepository.create('data.choices[0].text');
+    }
+    // ONLY FOR DEV PUPROSE
+
     dtoIn.answerId = answer.answerId;
     let question;
     try {
       question = await this.questionRepository.create(dtoIn);
     } catch (e) {
-      if (e.name === 'SequelizeUniqueConstraintError') {
+      if (
+        e.name === 'SequelizeUniqueConstraintError' ||
+        e.name === 'SequelizeForeignKeyConstraintError'
+      ) {
         question = await this.checkExistQuestion(dtoIn.question);
       }
+      throw new BadRequestException('Something wrong with DB', e.message);
     }
+
     await this.cacheService.set(
       dtoIn.question,
       JSON.stringify({ question, answer }),

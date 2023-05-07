@@ -16,8 +16,8 @@ export class QuestionRepository {
     return await this.questionModel.create(dtoIn);
   }
   async findAll(dtoIn: FindDto): Promise<IFindAllOut> {
-    const offset: number = dtoIn.pageInfo.pageSize * dtoIn.pageInfo.pageIndex;
-    const limit: number = dtoIn.pageInfo.pageSize;
+    const offset: number = dtoIn.pageSize * dtoIn.pageIndex;
+    const limit: number = dtoIn.pageSize;
 
     const options: FindOptions = {
       limit,
@@ -42,13 +42,13 @@ export class QuestionRepository {
       items,
       pageInfo: {
         pageTotal: items.length,
-        pageSize: dtoIn.pageInfo.pageSize,
-        pageIndex: dtoIn.pageInfo.pageIndex,
+        pageSize: dtoIn.pageSize,
+        pageIndex: dtoIn.pageIndex,
       },
     };
   }
   async getByQuestion(question: string): Promise<Question> {
-    return await this.questionModel.findOne({
+    return this.questionModel.findOne({
       where: { question },
       include: [
         {

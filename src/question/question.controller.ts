@@ -5,6 +5,7 @@ import {
   Get,
   UseGuards,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { QuestionService } from './services/question.service';
 import { CreateDto, FindDto } from './dto/question.dto';
@@ -38,8 +39,7 @@ export class QuestionController {
   }
   @UseGuards(JwtGuard)
   @Get('find')
-  async find(@Body() dtoIn: FindDto) {
-    const a = await this.questionRepository.findAll(dtoIn);
-    return a;
+  async find(@Query() dtoIn: FindDto) {
+    return await this.questionRepository.findAll(dtoIn);
   }
 }
