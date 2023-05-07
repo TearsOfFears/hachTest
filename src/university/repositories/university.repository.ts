@@ -17,15 +17,15 @@ export class UniversityRepository {
     return await this.universityModel.create(dtoIn);
   }
   async findAll(dtoIn: FindDto): Promise<IFindAllOut> {
-    const offset: number = dtoIn.pageSize * dtoIn.pageIndex;
-    const limit: number = dtoIn.pageSize;
-
     const options: FindOptions = {
-      limit,
-      offset,
       order: [[dtoIn.sortBy, dtoIn.order]],
     };
-
+    if (dtoIn.pageSize && dtoIn.pageIndex) {
+      const offset: number = dtoIn.pageSize * dtoIn.pageIndex;
+      const limit: number = dtoIn.pageSize;
+      options.limit = limit;
+      options.offset = offset;
+    }
     const items: University[] = await this.universityModel.findAll(options);
     return {
       items,
