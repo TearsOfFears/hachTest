@@ -5,15 +5,17 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/user.dto';
+import { ConfirmPasswordDto, CreateUserDto } from '../dto/user.dto';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './entities/user.entity';
-import { UserRepository } from './repositories/user.repository';
+import { User } from '../entities/user.entity';
+import { UserRepository } from '../repositories/user.repository';
 import { ConfigService } from '@nestjs/config';
-import { ITokens } from './dto/tokens.dto';
-import { IRefreshUser } from './interfaces/user.interaface';
-import { RegisterUserDto } from './dtoOut/user.dto';
+import { IGetTokens, ITokens } from '../dto/tokens.dto';
+import {
+  IConfirmRestorePassword,
+  IRefreshUser,
+} from '../interfaces/user.interaface';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +25,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async create(dtoIn: CreateUserDto) {
-    // Promise<RegisterUserDto>
     const oldUser = await this.userRepository.getByEmail(dtoIn.email);
     if (oldUser) {
       throw new BadRequestException('User with this email already exist');
@@ -31,13 +32,23 @@ export class AuthService {
     dtoIn.passwordHash = this.hashData(dtoIn.password);
     delete dtoIn.password;
     const user = await this.userRepository.create(dtoIn);
-    const tokens = await this.getTokens(user.userId, user.email);
+    const tokens = await this.getTokens({
+      userId: user.userId,
+      email: user.email,
+      isActivated: user.isActivated,
+    });
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
+
     return {
-      ...user,
+      user: user,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
+  }
+  async setConfirmMail(userId: string) {
+    return this.userRepository.updateByUserId(userId, {
+      isActivated: true,
+    });
   }
   async refreshTokens(refreshToken: string): Promise<IRefreshUser> {
     if (!refreshToken) {
@@ -55,7 +66,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Not found user');
     }
-    const tokens = await this.getTokens(user.userId, user.email);
+    const tokens = await this.getTokens({
+      userId: user.userId,
+      email: user.email,
+      isActivated: user.isActivated,
+    });
     await this.updateRefreshToken(user.userId, tokens.refreshToken);
     return { user, tokens };
   }
@@ -64,6 +79,18 @@ export class AuthService {
     if (!user) {
       throw new HttpException(
         'User with this email not exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
+  }
+  async updateUser(userId: string, fieldUpdate): Promise<User> {
+    let user;
+    try {
+      user = await this.userRepository.updateByUserId(userId, fieldUpdate);
+    } catch (e) {
+      throw new HttpException(
+        `Something wrong with update user ${e.message}`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -89,13 +116,19 @@ export class AuthService {
   }
   async login(email: string) {
     const user = await this.userRepository.getByEmail(email);
-    const tokens = await this.getTokens(user.userId, user.email);
+    const tokens = await this.getTokens({
+      userId: user.userId,
+      email: user.email,
+      isActivated: user.isActivated,
+    });
     const userUpdated = await this.updateRefreshToken(
       user.userId,
       tokens.refreshToken,
     );
-    delete userUpdated.refreshToken;
-    delete userUpdated.passwordHash;
+
+    if (!user.isActivated) {
+      throw new UnauthorizedException('Please activate your account');
+    }
     return {
       userUpdated,
       accessToken: tokens.accessToken,
@@ -116,27 +149,34 @@ export class AuthService {
       refreshToken: hashedRefreshToken,
     });
   }
-  async getTokens(userId: string, email: string): Promise<ITokens> {
+  async getTokens(dataHash: IGetTokens): Promise<ITokens> {
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync({
-        userId,
-        email,
+      this.jwtService.signAsync(dataHash),
+      this.jwtService.sign(dataHash, {
+        expiresIn: this.configService.get('JWT_TIME_REFRESH'),
+        secret: this.configService.get('JWT_SECRET_REFRESH'),
       }),
-      this.jwtService.sign(
-        {
-          userId,
-          email,
-        },
-        {
-          expiresIn: '1h',
-          secret: this.configService.get('JWT_SECRET_REFRESH'),
-        },
-      ),
     ]);
     return {
       accessToken,
       refreshToken,
     };
+  }
+  async confirmRestorePassword(dtoIn: IConfirmRestorePassword): Promise<User> {
+    let user;
+    dtoIn.passwordHash = this.hashData(dtoIn.password);
+    delete dtoIn.password;
+    try {
+      user = await this.userRepository.updateByUserId(dtoIn.userId, {
+        passwordHash: dtoIn.passwordHash,
+      });
+    } catch (e) {
+      throw new HttpException(
+        `Something wrong with update user ${e.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
   }
   hashData(dtoIn: any) {
     const salt = genSaltSync(10);

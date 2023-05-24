@@ -15,7 +15,7 @@ export const getSequelizeConfig = (): SequelizeModuleAsyncOptions => {
         logging: true,
         dialectOptions: {},
       };
-      if (configService.get('ENV') === 'PROD') {
+      if (configService.get('NODE_ENV') === 'PROD') {
         configs.dialectOptions = {
           ssl: {
             require: true,

@@ -5,8 +5,8 @@ import {
   PrimaryKey,
   DataType,
   ForeignKey,
-  HasOne,
   BelongsTo,
+  Index,
 } from 'sequelize-typescript';
 import { Answer } from './answer.entity';
 import { Subject } from '../../subject/entities/subject.entity';
@@ -15,14 +15,23 @@ import { Subject } from '../../subject/entities/subject.entity';
   timestamps: true,
   createdAt: true,
   updatedAt: true,
+  indexes: [
+    {
+      fields: ['question_vector'],
+      using: 'gin',
+    },
+  ],
 })
 export class Question extends Model<Question> {
   @PrimaryKey
   @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
   questionId: string;
 
-  @Column({ type: DataType.STRING(20000), unique: true })
+  @Column({ type: DataType.STRING })
   question: string;
+
+  @Column({ type: DataType.TSVECTOR })
+  question_vector: any;
 
   @Column(DataType.ARRAY(DataType.STRING))
   variants: string[];

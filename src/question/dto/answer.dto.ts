@@ -6,6 +6,8 @@ export class CreateDto {
 
   @IsString()
   subjectId: string;
+
+  question_vector?: string;
 }
 
 export class UpdateDto {

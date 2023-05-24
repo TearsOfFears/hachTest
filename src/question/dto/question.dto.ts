@@ -2,7 +2,7 @@ import {
   IsArray,
   ValidateNested,
   IsNumber,
-  IsObject,
+  ArrayMinSize,
   IsString,
   IsOptional,
 } from 'class-validator';
@@ -24,6 +24,12 @@ export class CreateDto {
 
   @IsString()
   subjectId: string;
+}
+
+export class UpdateSubjectsDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  subjectArrayId: string[];
 }
 
 export class PageInfo {
@@ -49,6 +55,10 @@ export class FindDto {
 
   @IsString()
   order: string;
+
+  @IsString()
+  @IsOptional()
+  question?: string;
 
   @IsString()
   @IsOptional()

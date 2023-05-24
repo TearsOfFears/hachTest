@@ -10,23 +10,27 @@ export class UserRepository {
   constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   async create(dto): Promise<User> {
-    const user = await this.userModel
-      .scope('withPasswordAndRefresh')
-      .create(dto);
+    const user = await this.userModel.create(dto);
     return user?.dataValues;
   }
   async getByEmail(email: string): Promise<User | null> {
-    const user = await this.userModel
-      .scope('withPasswordAndRefresh')
-      .findOne({ where: { email } });
+    const user = await this.userModel.findOne({ where: { email } });
     return user?.dataValues;
   }
   async getByUserId(userId: string): Promise<User | null> {
-    return this.userModel.findByPk(userId);
+    const user = await this.userModel.findByPk(userId);
+    return user?.dataValues;
   }
-  async updateByUserId(userId: string, fiedlUpdate: any): Promise<User> {
-    const [_, user] = await this.userModel.update<User>(fiedlUpdate, {
+  async updateByUserId(userId: string, fieldUpdate: any): Promise<User> {
+    const [_, user] = await this.userModel.update<User>(fieldUpdate, {
       where: { userId },
+      returning: true,
+    });
+    return user[0]?.dataValues;
+  }
+  async updateByEmail(email: string, fieldUpdate: any): Promise<User> {
+    const [_, user] = await this.userModel.update<User>(fieldUpdate, {
+      where: { email },
       returning: true,
     });
     return user[0]?.dataValues;
@@ -39,11 +43,11 @@ export class UserRepository {
       limit,
       offset,
       order: [[dtoIn.sortBy, dtoIn.order]],
-      include: [
-        {
-          model: University,
-        },
-      ],
+      // include: [
+      //   {
+      //     model: University,
+      //   },
+      // ],
       // attributes: { exclude: ['passwordHash', 'refreshToken'] },
     };
 

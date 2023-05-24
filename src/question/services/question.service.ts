@@ -27,7 +27,7 @@ export class QuestionService {
     );
     let answer;
     // ONLY FOR DEV PUPROSE
-    if (this.configService.get('ENV') === 'PROD') {
+    if (this.configService.get('NODE_ENV') === 'PROD') {
       const data = await this.openAIService.createCompletion(
         dtoIn.question + variantsParsed,
       );
@@ -42,13 +42,15 @@ export class QuestionService {
     try {
       question = await this.questionRepository.create(dtoIn);
     } catch (e) {
+      console.log('e', e);
       if (
         e.name === 'SequelizeUniqueConstraintError' ||
         e.name === 'SequelizeForeignKeyConstraintError'
       ) {
         question = await this.checkExistQuestion(dtoIn.question);
+      } else {
+        throw new BadRequestException('Something wrong with DB', e.message);
       }
-      throw new BadRequestException('Something wrong with DB', e.message);
     }
 
     await this.cacheService.set(
@@ -60,6 +62,7 @@ export class QuestionService {
 
   async checkExistQuestion(question: string) {
     const questionExist = await this.questionRepository.getByQuestion(question);
+    console.log('questionExist', questionExist);
     if (!questionExist) {
       throw new BadRequestException('Question not exists');
     }

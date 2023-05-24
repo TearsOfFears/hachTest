@@ -5,9 +5,10 @@ import {
   IsString,
   IsEmail,
   IsUUID,
+  IsArray,
 } from 'class-validator';
-import { User } from '../entities/user.entity';
-import { ITokens } from './tokens.dto';
+import { Exclude, Expose } from 'class-transformer';
+import { User, USER_FULL } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsString()
@@ -21,10 +22,47 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   passwordHash?: string;
+
+  @IsArray()
+  @IsOptional()
+  subjectArrayId?: string[];
   @IsNumber()
   @IsOptional()
   chatId?: number | null;
 }
+
+@Exclude()
+export class ResponseUserDto {
+  constructor(partial: User) {
+    Object.assign(this, partial);
+  }
+  @IsString()
+  name: string;
+
+  // @Expose({ groups: [USER_FULL] })
+  @IsEmail()
+  email: string;
+
+  // @Expose({ groups: [USER_FULL] })
+  @IsUUID()
+  universityId: string;
+
+  @Exclude({ toPlainOnly: true })
+  passwordHash: string;
+
+  @Exclude({ toPlainOnly: true })
+  refreshToken: string;
+
+  @IsArray()
+  @IsOptional()
+  subjectArrayId: string[];
+
+  @IsNumber()
+  @IsOptional()
+  // @Exclude()
+  chatId: number;
+}
+
 export class PageInfo {
   @IsNumber()
   pageSize: number;
@@ -61,6 +99,12 @@ export class LoginUserDto {
 export class LogoutUserDto {
   @IsUUID()
   userId: string;
+}
+export class ConfirmPasswordDto {
+  @IsUUID()
+  userId: string;
+  @IsString()
+  password: string;
 }
 export class EmailCheckDto {
   @IsString()

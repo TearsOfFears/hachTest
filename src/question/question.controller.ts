@@ -6,12 +6,13 @@ import {
   UseGuards,
   UsePipes,
   Query,
+  Param,
 } from '@nestjs/common';
 import { QuestionService } from './services/question.service';
-import { CreateDto, FindDto } from './dto/question.dto';
+import { CreateDto, FindDto, UpdateSubjectsDto } from './dto/question.dto';
 import { QuestionRepository } from './repositories/question.repository';
 import { TelegramService } from '../telegram/telegram.service';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/services/auth.service';
 import { JwtGuard } from '../guards/jwt.guard';
 import { TextTransformPipe } from '../pipes/textTransform.pipe';
 
@@ -37,6 +38,7 @@ export class QuestionController {
     );
     return dtoOut.question;
   }
+
   @UseGuards(JwtGuard)
   @Get('find')
   async find(@Query() dtoIn: FindDto) {

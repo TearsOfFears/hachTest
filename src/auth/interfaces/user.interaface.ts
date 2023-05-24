@@ -32,3 +32,9 @@ export interface IRefreshUser {
   user: User;
   tokens: ITokens;
 }
+
+export interface IConfirmRestorePassword {
+  userId: string;
+  password: string;
+  passwordHash?: string;
+}

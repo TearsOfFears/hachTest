@@ -10,25 +10,36 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  SerializeOptions,
+  Patch,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
+  ConfirmPasswordDto,
   CreateUserDto,
   FindDto,
   LoginUserDto,
   LogoutUserDto,
+  ResponseUserDto,
 } from './dto/user.dto';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { UserRepository } from './repositories/user.repository';
 import { Response, Request } from 'express';
 import { JwtGuard } from '../guards/jwt.guard';
-import { IRefreshUser } from './interfaces/user.interaface';
+import { IFindAllOut, IRefreshUser } from './interfaces/user.interaface';
 import { RegisterUserDto } from './dtoOut/user.dto';
+import { TextTransformPipe } from '../pipes/textTransform.pipe';
+import { UpdateSubjectsDto } from '../question/dto/question.dto';
+import { EmailService } from '../mailer/mailer.service';
+import { User, USER_FULL } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userRepository: UserRepository,
+    private readonly emailService: EmailService,
   ) {}
 
   @Post('register')
@@ -36,8 +47,9 @@ export class AuthController {
     @Body() dtoIn: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const user = await this.authService.create(dtoIn);
-    response.cookie('refreshToken', user.refreshToken, {
+    const { user, refreshToken } = await this.authService.create(dtoIn);
+    await this.emailService.sendConfirmMail(user);
+    response.cookie('refreshToken', refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: 'none',
@@ -46,9 +58,11 @@ export class AuthController {
     delete user.refreshToken;
     return user;
   }
-  //: Promise<RegisterUserDto>
   @HttpCode(200)
   @Post('login')
+  @SerializeOptions({
+    groups: [USER_FULL],
+  })
   async login(
     @Body() dtoIn: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
@@ -75,6 +89,29 @@ export class AuthController {
     await this.authService.logout(dtoIn.userId);
     response.clearCookie('refreshToken');
   }
+
+  @HttpCode(200)
+  @Get('restorePassword/:email')
+  @SerializeOptions({
+    groups: [USER_FULL],
+  })
+  async restorePassword(@Param('email') email: string) {
+    const user = await this.authService.getUserByEmail(email);
+    await this.emailService.sendRestoreMail(user);
+  }
+
+  @HttpCode(200)
+  @Patch('confirmPassword')
+  async confirmPassword(@Body() dtoIn: ConfirmPasswordDto) {
+    return this.authService.confirmRestorePassword(dtoIn);
+  }
+
+  @HttpCode(200)
+  @Post('activate/:userId')
+  async activate(@Param('userId') userId: string) {
+    return this.authService.setConfirmMail(userId);
+  }
+
   @HttpCode(200)
   @Get('emailCheck/:email')
   async emailCheck(@Param('email') email: string) {
@@ -98,20 +135,33 @@ export class AuthController {
     });
     return { accessToken: tokens.accessToken, ...user };
   }
-
   @UseGuards(JwtGuard)
-  @Get('find')
-  async find(@Body() dtoIn: FindDto) {
-    return await this.userRepository.findAll(dtoIn);
+  @Patch('updateSubjects/:userId')
+  async updateSubjects(
+    @Param('userId') userId: string,
+    @Body() dtoIn: UpdateSubjectsDto,
+  ) {
+    return this.authService.updateUser(userId, {
+      subjectArrayId: dtoIn.subjectArrayId,
+    });
   }
   @UseGuards(JwtGuard)
+  @Get('find')
+  async find(@Body() dtoIn: FindDto): Promise<IFindAllOut> {
+    return await this.userRepository.findAll(dtoIn);
+  }
+
+  // @SerializeOptions({
+  //   groups: [USER_FULL],
+  // })
+  @UseGuards(JwtGuard)
   @Get(':userId')
-  async getById(@Param('userId') userId: string) {
-    // console.log(dtoIn.pageSize);
+  async getById(@Param('userId') userId: string): Promise<ResponseUserDto> {
     const user = await this.userRepository.getByUserId(userId);
-    if (!user) {
+    if (user) {
+      return user;
+    } else {
       throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
     }
-    return user;
   }
 }

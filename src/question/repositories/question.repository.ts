@@ -5,14 +5,16 @@ import { Answer } from '../entities/answer.entity';
 import { Subject } from '../../subject/entities/subject.entity';
 import { FindDto } from '../dto/question.dto';
 import { CreateDto } from '../dto/answer.dto';
-import { FindOptions } from 'sequelize';
+import { FindOptions, Sequelize, Op } from 'sequelize';
 import { IFindAllOut } from '../interfaces/question.interface';
+
 @Injectable()
 export class QuestionRepository {
   constructor(
     @InjectModel(Question) private readonly questionModel: typeof Question,
   ) {}
   async create(dtoIn: CreateDto): Promise<Question> {
+    dtoIn.question_vector = `${dtoIn.question}`;
     return await this.questionModel.create(dtoIn);
   }
   async findAll(dtoIn: FindDto): Promise<IFindAllOut> {
@@ -23,6 +25,7 @@ export class QuestionRepository {
       limit,
       offset,
       order: [[dtoIn.sortBy, dtoIn.order]],
+      where: { subjectId: dtoIn.subjectId },
       include: [
         {
           model: Answer,
@@ -33,11 +36,17 @@ export class QuestionRepository {
       ],
     };
 
-    if (dtoIn.subjectId) {
-      options.where = { subjectId: dtoIn.subjectId };
+    if (dtoIn.question && dtoIn.question.length > 0) {
+      const searchTerms = dtoIn.question.split(' ');
+      options.where = {
+        question_vector: Sequelize.literal(
+          `question_vector @@ to_tsquery('*${searchTerms}:*')`,
+        ),
+      };
     }
 
     const items: Question[] = await this.questionModel.findAll(options);
+
     return {
       items,
       pageInfo: {

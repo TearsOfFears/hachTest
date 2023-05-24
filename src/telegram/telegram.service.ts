@@ -12,7 +12,7 @@ import {
   Command,
 } from 'nestjs-telegraf';
 import { Injectable } from '@nestjs/common';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../auth/services/auth.service';
 import { ContextTelegram } from './telegram.interface';
 import { actionButtons } from './telegram.buttons';
 import { UniversityRepository } from '../university/repositories/university.repository';
